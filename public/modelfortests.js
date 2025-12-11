@@ -1,4 +1,5 @@
 // Minimal in-memory storage used when no browser localStorage is available.
+// tässä on funktiot jota testaan modelfortests.js tiedostossa, otettu päätiedostosta testausta varten.
 function createMemoryStorage() {
     const store = new Map();
     return {

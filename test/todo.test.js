@@ -11,6 +11,9 @@ import {
 // Testisuunnitelmassani oli vähän puutteita, joten korjasin listan tähän paremmaksi.
 // Testaan tässä tehtävien näyttämisen, talentuminen, päivityksen, done/undo, poisto, ja myöhemmin prioriteetti filtering.
 
+// Tässä tehtävässä käytin tekoälyä korjaamaan localstorage ongelmaa, jossa piti simuiloida uuden varaston jotta sais tehtyä testit.
+// Käytin myös tekoälyä ehdottamaan testien struktuuria, ja eniten niiten korjaamisessa kun testit heitti erroria.
+
 describe('basic functions of tasks', () => {
     // --Näytä tehtävät--
     // palauta tyhjä näkymä jos ei ole tehtäviä
