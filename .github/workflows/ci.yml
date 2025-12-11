@@ -7,7 +7,7 @@ on:
     # Merge on käytännössä push, joten tämä kattaa tehtävänannon.
     push:
         branches:
-            - test-branch
+            - main
 
 # Määritellään työt (jobs), jotka robotti suorittaa.
 jobs:
