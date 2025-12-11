@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "ESNext",
+    "lib": ["ES2021", "DOM"],
+    "checkJs": false
+  },
+  "include": ["public/**/*"],
+  "exclude": ["node_modules"]
+}
+
