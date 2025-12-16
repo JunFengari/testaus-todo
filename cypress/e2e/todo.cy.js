@@ -1,5 +1,9 @@
-// end to end testit
-//
+/* end to end testit
+käytin AI:ta antamaan mulle esimerkki testejä jota muokkasin sopivaksi, yritin käyttää
+tekoälyä muokkaamaan testit yhtenäiseksi, mutta meni liian monimutkaiseksi (komentti alempana),
+joten palautin muutokset pois aijempaan versioon. Käytin myös teköälyn parannus ja korjaus
+ehdotuksia apuna koodaamisen aikana. 
+väleissä on monta wait komentoja jotta näkisi parempi ehkä mitä testeissä tapahtuu. */
 
 describe('To-Do App End-to-End Tests', () => {
     beforeEach(() => {
@@ -10,13 +14,13 @@ describe('To-Do App End-to-End Tests', () => {
     // luo tehtävä
     it('should create a new task', () => {
         // uuden tehtävän luonti eli topic, priority, status, description, sitten save
-        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#topic').type('luotu tehtävä');
         cy.get('#priority').select('medium');
         cy.get('#status').select('todo');
-        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#description').type('text');
         cy.get('#save-btn').click();
         // tarkista että on olemassa
-        cy.get('#task-list').should('contain', 'Testi tehtävä');
+        cy.get('#task-list').should('contain', 'luotu tehtävä');
         cy.wait(2000);
     });
 
@@ -26,30 +30,33 @@ describe('To-Do App End-to-End Tests', () => {
 
     // muokkaa tehtävä
     it('should edit an existing task', () => {
-        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#topic').type('Muokattava tehtävä');
         cy.get('#priority').select('medium');
         cy.get('#status').select('todo');
-        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#description').type('text');
         cy.get('#save-btn').click();
+        cy.wait(2000);
         // muokkaa tehtövää: avaa, clear and type.
         // käytetään first(), jotta valittaisiin vain ensimmäisen mätsin
         cy.get('.task button[data-action="edit"]').first().click();
-        cy.get('#topic').clear().type('Muokattu tehtävä');
+        cy.get('#topic').clear().type('Muokattu!');
         cy.get('#save-btn').click();
+        cy.wait(2000);
         // tarkista että se muokkautui
-        cy.get('#task-list').should('contain', 'Muokattu tehtävä');
+        cy.get('#task-list').should('contain', 'Muokattu!');
         cy.wait(2000);
     });
 
     // merkitse tehtävä tehdyksi
     it('should mark a task as done', () => {
-        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#topic').type('Task to be done');
         cy.get('#priority').select('medium');
         cy.get('#status').select('todo');
-        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#description').type('text');
         cy.get('#save-btn').click();
         // klikkaa edit
         cy.get('.task button[data-action="complete"]').first().click();
+        cy.wait(2000);
         // tarkista että on done tilassa
         cy.get('.task').first().should('have.class', 'done');
         cy.wait(2000);
@@ -57,13 +64,14 @@ describe('To-Do App End-to-End Tests', () => {
 
     // merkitse tehtävä takaisin kesken tilaan
     it('should undo a completed task', () => {
-        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#topic').type('Undo task');
         cy.get('#priority').select('medium');
         cy.get('#status').select('todo');
-        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#description').type('text');
         cy.get('#save-btn').click();
         // ensimmäinen klikkaus = done
         cy.get('.task button[data-action="complete"]').first().click();
+        cy.wait(2000);
         // toinen klikkaus = undo
         cy.get('.task button[data-action="complete"]').first().click();
         // tarkista että ei ole done tilassa
@@ -73,16 +81,17 @@ describe('To-Do App End-to-End Tests', () => {
 
     // poista tehtävä
     it('should delete a task', () => {
-        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#topic').type('Delete task');
         cy.get('#priority').select('medium');
         cy.get('#status').select('todo');
-        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#description').type('text');
         cy.get('#save-btn').click();
+        cy.wait(2000);
         // cy.on estää ongelman, jossa browserin confirm boksi estää testin
         // tämä hyväksyy sen automaattisesti
         cy.on('window:confirm', () => true);
         cy.get('.task button[data-action="delete"]').first().click();
-        cy.get('#task-list').should('not.contain', 'Testi tehtävä');
+        cy.get('#task-list').should('not.contain', 'Delete task');
         cy.wait(2000);
     });
 
@@ -90,6 +99,5 @@ describe('To-Do App End-to-End Tests', () => {
     it('should display empty state when no tasks exist', () => {
         cy.get('#task-list').should('be.empty');
         cy.get('#empty-state').should('be.visible');
-        cy.wait(2000);
     });
 });
