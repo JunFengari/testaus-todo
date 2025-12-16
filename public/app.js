@@ -87,7 +87,7 @@
         }
         emptyState.style.display = 'none';
 
-        // EDIT THIS PART FOR THE LOPPUTYÖ!!!!!!!!!!! Delete and redo after understanding
+        // REMOVE THIS PART BEFORE LOPPUTYÖ!!!!!!!!!!! Delete
 
         tasks
             .sort((a, b) => {

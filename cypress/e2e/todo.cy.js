@@ -1,0 +1,95 @@
+// end to end testit
+//
+
+describe('To-Do App End-to-End Tests', () => {
+    beforeEach(() => {
+        cy.clearLocalStorage(); // clear anything in the cache
+        cy.visit('/'); // mene sovellukseen
+    });
+
+    // luo tehtävä
+    it('should create a new task', () => {
+        // uuden tehtävän luonti eli topic, priority, status, description, sitten save
+        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#save-btn').click();
+        // tarkista että on olemassa
+        cy.get('#task-list').should('contain', 'Testi tehtävä');
+        cy.wait(2000);
+    });
+
+    // yritin ensin implementoida niin että käytettäisiin samaa tehtävää kaikissa testeissä,
+    // mutta oli paljon helpompi luoda jokaiseen oman. Tekoälyn mukaan se on myös parempi näin,
+    // koska testit ovat itsenäisempiä, eikä yhden testin epäonnistuminen vaikuta toiseen.
+
+    // muokkaa tehtävä
+    it('should edit an existing task', () => {
+        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#save-btn').click();
+        // muokkaa tehtövää: avaa, clear and type.
+        // käytetään first(), jotta valittaisiin vain ensimmäisen mätsin
+        cy.get('.task button[data-action="edit"]').first().click();
+        cy.get('#topic').clear().type('Muokattu tehtävä');
+        cy.get('#save-btn').click();
+        // tarkista että se muokkautui
+        cy.get('#task-list').should('contain', 'Muokattu tehtävä');
+        cy.wait(2000);
+    });
+
+    // merkitse tehtävä tehdyksi
+    it('should mark a task as done', () => {
+        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#save-btn').click();
+        // klikkaa edit
+        cy.get('.task button[data-action="complete"]').first().click();
+        // tarkista että on done tilassa
+        cy.get('.task').first().should('have.class', 'done');
+        cy.wait(2000);
+    });
+
+    // merkitse tehtävä takaisin kesken tilaan
+    it('should undo a completed task', () => {
+        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#save-btn').click();
+        // ensimmäinen klikkaus = done
+        cy.get('.task button[data-action="complete"]').first().click();
+        // toinen klikkaus = undo
+        cy.get('.task button[data-action="complete"]').first().click();
+        // tarkista että ei ole done tilassa
+        cy.get('.task').first().should('not.have.class', 'done');
+        cy.wait(2000);
+    });
+
+    // poista tehtävä
+    it('should delete a task', () => {
+        cy.get('#topic').type('Testi tehtävä');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('Tehtävän kuvaus');
+        cy.get('#save-btn').click();
+        // cy.on estää ongelman, jossa browserin confirm boksi estää testin
+        // tämä hyväksyy sen automaattisesti
+        cy.on('window:confirm', () => true);
+        cy.get('.task button[data-action="delete"]').first().click();
+        cy.get('#task-list').should('not.contain', 'Testi tehtävä');
+        cy.wait(2000);
+    });
+
+    // näytä tyhjä näkymä, kun ei ole tehtäviä
+    it('should display empty state when no tasks exist', () => {
+        cy.get('#task-list').should('be.empty');
+        cy.get('#empty-state').should('be.visible');
+        cy.wait(2000);
+    });
+});
