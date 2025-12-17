@@ -136,5 +136,3 @@ describe('basic functions of tasks', () => {
         expect(updatedtasks.length).toBe(0);
     });
 });
-
-//--Myöhemmin lisää prioriteetti organisointi tähän--

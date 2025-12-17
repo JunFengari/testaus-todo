@@ -1,6 +1,11 @@
 /* eslint-env browser */
 /* global document, window, localStorage */
 
+/* Käytin tekoälyä lopputyön tekemiseen sillä tavalla, että kysyin siltä step
+by step ohjeita, eli miten voidaan tehdä priority filtering taskeille. 
+Toimin ohjeiden mukaisesti, lisäsin ne koodiin (html, css, sekä päätiedostoon) yksitellen, 
+ja ymmärsin mitä jokainen vaihe suunnilleen tekee.*/
+
 /**
  * @typedef {Object} Task
  * @property {string} id
@@ -74,50 +79,82 @@
     const emptyState = /** @type {HTMLElement} */ (
         document.getElementById('empty-state')
     );
+    // priority filter legend
+    const priorityLegend = /** @type {HTMLElement} */ (
+        document.getElementById('priority-filter')
+    );
 
-    // State
+    // 'kuuntelee' priority filter napautuksia.
+    priorityLegend.addEventListener('click', (e) => {
+        const target = /** @type {HTMLElement} */ (e.target);
+        if (!target.matches('[data-priority]')) return;
+
+        // Update filter state
+        currentPriorityFilter = target.dataset.priority;
+
+        // Optional: add active styling later
+        priorityLegend
+            .querySelectorAll('.pill')
+            .forEach((b) => b.classList.remove('active'));
+        target.classList.add('active');
+
+        render();
+    });
+
+    // State, aloitetaan currentPriorityFilter with 'all'
     let tasks = loadTasks();
+    let currentPriorityFilter = 'all'; // all =  high | medium | low
 
     // Render
-    /* En tiedä missä vaiheessa render funktio katosi täältä, en huomannut katsoa
-    e2e testien aikana varsinaista localhostia. Vertailin alkuperäistä Heikin 
-    repossa olevaa app.js tiedostoa ja siellähän se render funktio oli kokonaisena.*/
+    /* Tähän tehtiin muutoksen missä ei näytetä suoraan kaikki taskit, 
+    vain lisätään priority filter with visible tasks, joka jatkuu alkuperäiseen
+    koodiin kanssa. */
     function render() {
         list.innerHTML = '';
-        if (!tasks.length) {
+
+        // --------- Apply priority filter ----------
+        let visibleTasks = tasks;
+        if (currentPriorityFilter !== 'all') {
+            visibleTasks = tasks.filter(
+                (t) => t.priority === currentPriorityFilter
+            );
+        }
+        // ----------------------------------------
+
+        if (!visibleTasks.length) {
             emptyState.style.display = 'block';
             return;
         }
         emptyState.style.display = 'none';
 
-        tasks.forEach((t) => {
+        visibleTasks.forEach((t) => {
             const li = document.createElement('li');
             li.className = 'task' + (t.completed ? ' done' : '');
             li.dataset.id = t.id;
             li.innerHTML = `
-      <div>
-        <div class="title">${escapeHtml(t.topic)}</div>
-        <div class="desc">${escapeHtml(t.description || '')}</div>
-      </div>
-      <div class="meta">
-        <span class="badge prio-${t.priority}">
-          <span class="dot"></span>
-          ${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}
-        </span>
-      </div>
-      <div class="meta">
-        ${badgeForStatus(t.status)}
-      </div>
-      <div class="controls">
-        <button data-action="edit" class="secondary">Edit</button>
-        <button data-action="complete" class="${
-            t.completed ? 'secondary' : ''
-        }">
-          ${t.completed ? 'Undo' : 'Complete'}
-        </button>
-        <button data-action="delete" class="danger">Delete</button>
-      </div>
-    `;
+          <div>
+            <div class="title">${escapeHtml(t.topic)}</div>
+            <div class="desc">${escapeHtml(t.description || '')}</div>
+          </div>
+          <div class="meta">
+            <span class="badge prio-${t.priority}">
+              <span class="dot"></span>
+              ${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}
+            </span>
+          </div>
+          <div class="meta">
+            ${badgeForStatus(t.status)}
+          </div>
+          <div class="controls">
+            <button data-action="edit" class="secondary">Edit</button>
+            <button data-action="complete" class="${
+                t.completed ? 'secondary' : ''
+            }">
+              ${t.completed ? 'Undo' : 'Complete'}
+            </button>
+            <button data-action="delete" class="danger">Delete</button>
+          </div>
+        `;
             list.appendChild(li);
         });
     }

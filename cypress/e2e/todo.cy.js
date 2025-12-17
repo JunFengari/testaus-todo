@@ -92,12 +92,66 @@ describe('To-Do App End-to-End Tests', () => {
         cy.on('window:confirm', () => true);
         cy.get('.task button[data-action="delete"]').first().click();
         cy.get('#task-list').should('not.contain', 'Delete task');
-        cy.wait(2000);
+        cy.wait(1000);
     });
 
     // näytä tyhjä näkymä, kun ei ole tehtäviä
     it('should display empty state when no tasks exist', () => {
         cy.get('#task-list').should('be.empty');
         cy.get('#empty-state').should('be.visible');
+    });
+
+    // tässä viimeisessä osiossa kysyin tekoälyltä mitä testejä kannattaa tehdä,
+    // ja valitsin nämä, rakensin testit itsenäisesti muiden testien pohjalta.
+    // Koin että tämä yksi testi riittää hyvin näyttämään että prioriteetti filtteri toimii.
+
+    // filteröi taskeja, näkyykö ne oikein?
+    // päätin laittaa nää kaikki samaan it:iin jotta ei tarvis joka kerta luoda uudet taskit.
+    it('should filter tasks by priority', () => {
+        cy.get('#topic').type('High Prio task');
+        cy.get('#priority').select('high');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('text');
+        cy.get('#save-btn').click();
+
+        cy.get('#topic').type('Med Prio task');
+        cy.get('#priority').select('medium');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('text');
+        cy.get('#save-btn').click();
+
+        cy.get('#topic').type('Low Prio task');
+        cy.get('#priority').select('low');
+        cy.get('#status').select('todo');
+        cy.get('#description').type('text');
+        cy.get('#save-btn').click();
+
+        cy.wait(1000);
+
+        // pari eri prioriteetin taskia luotu, nyt voidaan tarkistaa toimiiko filtteri
+        cy.get('[data-priority="high"]').click();
+        cy.get('#task-list').should('contain', 'High Prio task');
+        cy.get('#task-list').should('not.contain', 'Med Prio task');
+        cy.get('#task-list').should('not.contain', 'Low Prio task');
+        cy.wait(1000);
+
+        cy.get('[data-priority="medium"]').click();
+        cy.get('#task-list').should('contain', 'Med Prio task');
+        cy.get('#task-list').should('not.contain', 'Low Prio task');
+        cy.get('#task-list').should('not.contain', 'High Prio task');
+        cy.wait(1000);
+
+        cy.get('[data-priority="low"]').click();
+        cy.get('#task-list').should('contain', 'Low Prio task');
+        cy.get('#task-list').should('not.contain', 'Med Prio task');
+        cy.get('#task-list').should('not.contain', 'High Prio task');
+        cy.wait(1000);
+
+        // näyttää jälleen kaikki taskit, kun valitaan all.
+        cy.get('[data-priority="all"]').click();
+        cy.get('#task-list').should('contain', 'High Prio task');
+        cy.get('#task-list').should('contain', 'Med Prio task');
+        cy.get('#task-list').should('contain', 'Low Prio task');
+        cy.wait(1000);
     });
 });
