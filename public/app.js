@@ -79,6 +79,9 @@
     let tasks = loadTasks();
 
     // Render
+    /* En tiedä missä vaiheessa render funktio katosi täältä, en huomannut katsoa
+    e2e testien aikana varsinaista localhostia. Vertailin alkuperäistä Heikin 
+    repossa olevaa app.js tiedostoa ja siellähän se render funktio oli kokonaisena.*/
     function render() {
         list.innerHTML = '';
         if (!tasks.length) {
@@ -87,48 +90,37 @@
         }
         emptyState.style.display = 'none';
 
-        // REMOVE THIS PART BEFORE LOPPUTYÖ!!!!!!!!!!! Delete
-
-        tasks
-            .sort((a, b) => {
-                // Not-done first, then by priority (high->low), then newest first
-                if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                const prioRank = { high: 0, medium: 1, low: 2 };
-                if (prioRank[a.priority] !== prioRank[b.priority]) {
-                    return prioRank[a.priority] - prioRank[b.priority];
-                }
-                return b.createdAt - a.createdAt;
-            })
-            .forEach((t) => {
-                const li = document.createElement('li');
-                li.className = 'task' + (t.completed ? ' done' : '');
-                li.dataset.id = t.id;
-                li.innerHTML = `
-					<div>
-						<div class="title">${escapeHtml(t.topic)}</div>
-						<div class="desc">${escapeHtml(t.description || '')}</div>
-					</div>
-					<div class="meta">
-						<span class="badge prio-${t.priority}">
-							<span class="dot"></span>
-							${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}
-						</span>
-					</div>
-					<div class="meta">
-						${badgeForStatus(t.status)}
-					</div>
-					<div class="controls">
-						<button data-action="edit" class="secondary">Edit</button>
-						<button data-action="complete" class="${t.completed ? 'secondary' : ''}">
-							${t.completed ? 'Undo' : 'Complete'}
-						</button>
-						<button data-action="delete" class="danger">Delete</button>
-					</div>
-				`;
-                list.appendChild(li);
-            });
+        tasks.forEach((t) => {
+            const li = document.createElement('li');
+            li.className = 'task' + (t.completed ? ' done' : '');
+            li.dataset.id = t.id;
+            li.innerHTML = `
+      <div>
+        <div class="title">${escapeHtml(t.topic)}</div>
+        <div class="desc">${escapeHtml(t.description || '')}</div>
+      </div>
+      <div class="meta">
+        <span class="badge prio-${t.priority}">
+          <span class="dot"></span>
+          ${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}
+        </span>
+      </div>
+      <div class="meta">
+        ${badgeForStatus(t.status)}
+      </div>
+      <div class="controls">
+        <button data-action="edit" class="secondary">Edit</button>
+        <button data-action="complete" class="${
+            t.completed ? 'secondary' : ''
+        }">
+          ${t.completed ? 'Undo' : 'Complete'}
+        </button>
+        <button data-action="delete" class="danger">Delete</button>
+      </div>
+    `;
+            list.appendChild(li);
+        });
     }
-    // !!! ENDS HERE !!!!
 
     function badgeForStatus(status) {
         const label =
